@@ -23,7 +23,9 @@ class BookingController extends Controller
     public function show($id)
     {
         $studio = Studio::findOrFail($id);
-        return view('form_booking', compact('studio'));
+        
+        // CARA 1 FIX: Diubah ke folder 'bookings'
+        return view('bookings.form_booking', compact('studio'));
     }
 
     // =========================================================================
@@ -66,9 +68,11 @@ class BookingController extends Controller
         $booking->waktu_mulai = $waktuMulai;
         $booking->waktu_selesai = $waktuSelesai;
         $booking->keperluan = $request->keperluan;
+        $booking->status = 'pending'; // Memastikan status awal terisi pending agar muncul di riwayat
         $booking->save();
 
-        return redirect()->route('home')->with('success', 'Booking studio berhasil dicatat!');
+        // FIX: Diubah dari 'home' ke 'dashboard' sesuai rute aktif proyekmu
+        return redirect()->route('dashboard')->with('success', 'Booking studio berhasil dicatat!');
     }
 
     // =========================================================================
@@ -81,7 +85,8 @@ class BookingController extends Controller
             ->orderBy('waktu_mulai', 'asc')
             ->get();
 
-        return view('my_booking', compact('bookings'));
+        // CARA 1 FIX: Diubah dari 'my_booking' menjadi 'bookings.my_booking'
+        return view('bookings.my_booking', compact('bookings'));
     }
 
     // =========================================================================
@@ -95,6 +100,7 @@ class BookingController extends Controller
 
         $booking->delete();
 
-        return redirect()->back()->with('success', 'Booking studio berhasil dibatalkan!');
+        // FIX: Diarahkan langsung ke rute riwayat booking agar halaman segar kembali
+        return redirect()->route('booking.my')->with('success', 'Booking studio berhasil dibatalkan!');
     }
 }

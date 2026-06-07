@@ -25,29 +25,40 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('home') }}">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('dashboard') }}">
                 <i class="fa-solid fa-guitar me-2"></i> MNC Studios Booking
             </a>
             
-            <div class="ms-auto">
-                @if (Route::has('login'))
-                    <div class="d-flex align-items-center gap-2">
-                        @auth
-                            <a href="{{ route('booking.my') }}" class="nav-link text-white fw-semibold me-3">
-                                <i class="fa-solid fa-clock-rotate-left me-1"></i> Riwayat Booking
-                            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                            <a href="{{ url('/dashboard') }}" class="btn btn-light fw-bold text-success px-4 shadow-sm">
-                                <i class="fa-solid fa-gauge me-1"></i> Dashboard
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    @auth
+                        <a href="{{ route('booking.my') }}" class="nav-link text-white fw-semibold me-3">
+                            <i class="fa-solid fa-clock-rotate-left me-1"></i> Riwayat Booking
+                        </a>
+
+                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'super_admin')
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-warning fw-bold text-dark px-3 shadow-sm me-2">
+                                <i class="fa-solid fa-gauge me-1"></i> Panel Admin
                             </a>
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-outline-light me-2 px-3">Log in</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="btn btn-warning px-3 shadow-sm text-dark fw-bold">Register</a>
-                            @endif
-                        @endauth
-                    </div>
-                @endif
+                        @endif
+
+                        <form method="POST" action="{{ route('logout') }}" class="d-inline m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-danger fw-bold px-3 shadow-sm">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i> Log Out
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-outline-light me-2 px-3">Log in</a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="btn btn-warning px-3 shadow-sm text-dark fw-bold">Register</a>
+                        @endif
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>

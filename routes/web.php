@@ -12,17 +12,20 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// 1. HALAMAN UTAMA
-Route::get('/', [BookingController::class, 'index'])->name('home');
+// 1. HALAMAN UTAMA (Diubah agar langsung otomatis melempar ke halaman Login)
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 // 2. KELOMPOK RUTE YANG WAJIB LOGIN (User Biasa & Admin)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    
+    // Halaman Cari & Booking Studio (Pindahan dari halaman utama, sekarang wajib login)
+    Route::get('/dashboard', [BookingController::class, 'index'])->name('dashboard');
 
     // Fitur Booking Studio
     Route::get('/booking/{id}', [BookingController::class, 'show'])->name('booking.form');
+    // Tambahan: Pastikan rute simpan booking diarahkan ke dashboard setelah selesai
     Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 
     // TUGAS PERSON B: Riwayat & Pembatalan Booking User
