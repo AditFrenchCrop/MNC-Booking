@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking; // Import Model Booking
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
     // 1. Menampilkan Semua Request Booking Studio
     public function index()
     {
-        // Mengambil semua data booking gabung dengan data nama studio
-        $bookings = DB::table('bookings')
-            ->join('studios', 'bookings::studio_id', '=', 'studios.id')
-            ->select('bookings.*', 'studios.nama_studio')
-            ->orderBy('bookings.created_at', 'desc')
+        // Menggunakan Eloquent + Eager Loading relasi 'studio' agar aman dari bentrokan kolom
+        $bookings = Booking::with('studio')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('admin.dashboard', compact('bookings'));
@@ -23,14 +21,29 @@ class AdminController extends Controller
     // 2. Aksi Terima Booking (Approve)
     public function approve($id)
     {
-        DB::table('bookings')->where('id', $id)->update(['status' => 'approved']);
-        return redirect()->back()->with('success', 'Booking studio berhasil disetujui!');
+        $booking = Booking::find($id);
+        
+        if ($booking) {
+            // Kita gunakan properti dinamis atau fallback jika kolom database berbeda nama
+            $booking->status = 'approved';
+            $booking->save();
+            return redirect()->back()->with('success', 'Booking studio berhasil disetujui!');
+        }
+
+        return redirect()->back()->with('error', 'Data booking tidak ditemukan.');
     }
 
     // 3. Aksi Tolak Booking (Reject)
     public function reject($id)
     {
-        DB::table('bookings')->where('id', $id)->update(['status' => 'rejected']);
-        return redirect()->back()->with('error', 'Booking studio telah ditolak.');
+        $booking = Booking::find($id);
+
+        if ($booking) {
+            $booking->status = 'rejected';
+            $booking->save();
+            return redirect()->back()->with('success', 'Booking studio telah ditolak.');
+        }
+
+        return redirect()->back()->with('error', 'Data booking tidak ditemukan.');
     }
 }
